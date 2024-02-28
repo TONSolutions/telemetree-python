@@ -4,7 +4,7 @@ from socket import timeout
 from typing import Optional
 from urllib import request, error
 
-from telemetree import constants
+from src.telemetree.constants import JSON_HEADER, HTTP_TIMEOUT
 
 
 class HttpStatus(Enum):
@@ -16,9 +16,6 @@ class HttpStatus(Enum):
     FORBIDDEN = 403
     NOT_FOUND = 404
     INTERNAL_SERVER_ERROR = 500
-
-
-JSON_HEADER = {"Content-Type": "application/json; charset=UTF-8", "Accept": "*/*"}
 
 
 class HttpClient:
@@ -56,7 +53,7 @@ class HttpClient:
             else:
                 req = request.Request(url, headers=headers)
 
-            resp = request.urlopen(req, timeout=constants.HTTP_TIMEOUT)
+            resp = request.urlopen(req, timeout=HTTP_TIMEOUT)
             return resp
 
         except (error.HTTPError, error.URLError, timeout) as e:
@@ -88,7 +85,7 @@ class HttpClient:
                 req = request.Request(url, headers=headers)
 
             data = json.dumps(data).encode("utf-8")
-            resp = request.urlopen(req, data, timeout=constants.HTTP_TIMEOUT)
+            resp = request.urlopen(req, data, timeout=HTTP_TIMEOUT)
             return resp
 
         except (error.HTTPError, error.URLError, timeout) as e:

@@ -1,0 +1,2 @@
+class WrongIdentityKeys(Exception):
+    pass

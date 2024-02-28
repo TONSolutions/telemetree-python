@@ -2,7 +2,24 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class FromUser(BaseModel):
+class BaseUser(BaseModel):
+    """
+    Represents a base user entity.
+
+    Attributes:
+        entity_id (int): The ID of the user entity.
+        first_name (str): The first name of the user.
+        last_name (Optional[str]): The last name of the user (optional).
+        username (Optional[str]): The username of the user (optional).
+    """
+
+    entity_id: int
+    first_name: str
+    last_name: Optional[str] = None
+    username: Optional[str] = None
+
+
+class FromUser(BaseUser):
     """
     Represents a user who sent a message.
 
@@ -16,16 +33,12 @@ class FromUser(BaseModel):
         is_premium (Optional[bool]): Indicates whether the user is a premium user or not (optional).
     """
 
-    entity_id: int
     is_bot: bool
-    first_name: str
-    last_name: Optional[str]
-    username: Optional[str]
     language_code: Optional[str]
     is_premium: Optional[bool]
 
 
-class Chat(BaseModel):
+class Chat(BaseUser):
     """
     Represents a chat entity.
 
@@ -37,10 +50,6 @@ class Chat(BaseModel):
         type (str): The type of the chat.
     """
 
-    entity_id: int
-    first_name: str
-    last_name: Optional[str]
-    username: Optional[str]
     type: str
 
 
@@ -129,3 +138,24 @@ class MyChatMember(BaseModel):
     date: int
     old_chat_member: ChatMember
     new_chat_member: ChatMember
+
+
+class Update(BaseModel):
+    """
+    Represents an update received from the Telegram Bot API.
+
+    Attributes:
+        update_id (int): The update's unique identifier.
+        message (Optional[Message]): New incoming message of any kind — text, photo, sticker, etc.
+        edited_message (Optional[Message]): New version of a message that is known to the bot and was edited.
+        inline_query (Optional[InlineQuery]): New incoming inline query.
+        chosen_inline_result (Optional[ChosenInlineResult]): The result of an inline query that was chosen by a user and sent to their chat partner.
+        my_chat_member (Optional[MyChatMember]): A chat member's status was updated in the chat.
+    """
+
+    update_id: int
+    message: Optional[Message]
+    edited_message: Optional[Message]
+    inline_query: Optional[InlineQuery]
+    chosen_inline_result: Optional[ChosenInlineResult]
+    my_chat_member: Optional[MyChatMember]
