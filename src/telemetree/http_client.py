@@ -1,10 +1,9 @@
-import json
 from enum import Enum
 from socket import timeout
-from typing import Optional
-from urllib import request, error
+import requests
 
-from src.telemetree.constants import JSON_HEADER, HTTP_TIMEOUT
+from src.telemetree.constants import HTTP_TIMEOUT
+from src.telemetree.config import Config
 
 
 class HttpStatus(Enum):
@@ -19,56 +18,18 @@ class HttpStatus(Enum):
 
 
 class HttpClient:
-    """
-    A class for making HTTP requests.
+    def __init__(self, settings: Config) -> None:
+        self.settings = settings
+        self.url = self.settings.config.host
+        self.api_key = self.settings.api_key
+        self.project_id = self.settings.project_id
 
-    Attributes:
-        None
-
-    Methods:
-        get: Sends an HTTP GET request to the specified URL.
-        post: Sends a POST request to the specified URL with the given data and headers.
-    """
-
-    @staticmethod
-    def get(url: str, headers: Optional[dict] = None):
-        """
-        Sends an HTTP GET request to the specified URL.
-
-        Args:
-            url (str): The URL to send the GET request to.
-            headers (Optional[dict]): Optional headers to include in the request.
-
-        Returns:
-            HTTPResponse: The response object returned by the server.
-
-        Raises:
-            HTTPError: If an HTTP error occurs.
-            URLError: If a URL error occurs.
-            timeout: If the request times out.
-        """
-        try:
-            if not headers:
-                req = request.Request(url, headers=JSON_HEADER)
-            else:
-                req = request.Request(url, headers=headers)
-
-            resp = request.urlopen(req, timeout=HTTP_TIMEOUT)
-            return resp
-
-        except (error.HTTPError, error.URLError, timeout) as e:
-            print(f"Error: {e}")
-            raise e
-
-    @staticmethod
-    def post(url: str, data: dict, headers: Optional[dict] = None):
+    def post(self, data: dict):
         """
         Sends a POST request to the specified URL with the given data and headers.
 
         Args:
-            url (str): The URL to send the POST request to.
             data (dict): The data to be sent in the request body.
-            headers (dict, optional): Additional headers to include in the request. Defaults to None.
 
         Returns:
             HTTPResponse: The response object returned by the server.
@@ -79,15 +40,22 @@ class HttpClient:
             timeout: If the request times out.
         """
         try:
-            if not headers:
-                req = request.Request(url, headers=JSON_HEADER)
-            else:
-                req = request.Request(url, headers=headers)
+            headers = {
+                "Content-Type": "application/json",
+                "x-api-key": self.api_key,
+                "x-project-id": self.project_id,
+            }
 
-            data = json.dumps(data).encode("utf-8")
-            resp = request.urlopen(req, data, timeout=HTTP_TIMEOUT)
-            return resp
+            request = requests.post(
+                self.url, json=data, headers=headers, timeout=HTTP_TIMEOUT
+            )
 
-        except (error.HTTPError, error.URLError, timeout) as e:
+            return request
+
+        except (
+            requests.exceptions.HTTPError,
+            requests.exceptions.RequestException,
+            timeout,
+        ) as e:
             print(f"Error: {e}")
             raise e
