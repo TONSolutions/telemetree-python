@@ -11,24 +11,25 @@ class EventBuilder:
         self.commands_to_track = self.config.auto_capture_commands
 
     def parse_telegram_update(self, update_dict: dict) -> Optional[Update]:
-        update = Update(**update_dict)  # Convert dict to Update object
+        # Create an Update object from the dictionary
+        update = Update(**update_dict)
         if self.should_track_update(update):
             return update
         return None
 
     def should_track_update(self, update: Update) -> bool:
         # Directly checks if the update should be tracked based on its content
-        if update.message and self.track_telegram_message(update):
-            return True
+        if "message" in self.events_to_track:
+            if update.message:
+                return self.track_telegram_message(update.message.text)
+            elif update.edited_message:
+                return self.track_telegram_message(update.edited_message.text)
+
         return self.track_telegram_event(update)
 
-    def track_telegram_message(self, update: Update) -> bool:
+    def track_telegram_message(self, text: str) -> bool:
         # Checks if the message text matches any of the commands to track
-        if update.message.text:
-            return any(
-                command in update.message.text for command in self.commands_to_track
-            )
-        return False
+        return any(command in text for command in self.commands_to_track)
 
     def track_telegram_event(self, update: Update) -> bool:
         # Check if the type of event is in the list of events to track

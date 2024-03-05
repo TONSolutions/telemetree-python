@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BaseUser(BaseModel):
@@ -13,7 +13,7 @@ class BaseUser(BaseModel):
         username (Optional[str]): The username of the user (optional).
     """
 
-    entity_id: int
+    entity_id: int = Field(..., alias="id")
     first_name: str
     last_name: Optional[str] = None
     username: Optional[str] = None
@@ -34,8 +34,8 @@ class FromUser(BaseUser):
     """
 
     is_bot: bool
-    language_code: Optional[str]
-    is_premium: Optional[bool]
+    language_code: Optional[str] = None
+    is_premium: Optional[bool] = None
 
 
 class Chat(BaseUser):
@@ -64,8 +64,8 @@ class InlineQuery(BaseModel):
         offset (str): The offset for the results.
     """
 
-    entity_id: str
-    from_user: FromUser
+    entity_id: str = Field(..., alias="id")
+    from_user: FromUser = Field(..., alias="from")
     query: str
     offset: str
 
@@ -82,8 +82,7 @@ class ChosenInlineResult(BaseModel):
         result_id (str): The ID of the chosen result.
     """
 
-    entity_id: str
-    from_user: FromUser
+    from_user: FromUser = Field(..., alias="from")
     inline_message_id: str
     query: str
     result_id: str
@@ -101,11 +100,15 @@ class Message(BaseModel):
         text (str): The content of the message.
     """
 
-    entity_id: int
-    from_user: FromUser
+    message_id: int
+    from_user: FromUser = Field(..., alias="from")
     chat: Chat
     date: int
     text: str
+
+
+class EditedMessage(Message):
+    edit_date: int
 
 
 class ChatMember(BaseModel):
@@ -134,7 +137,7 @@ class MyChatMember(BaseModel):
     """
 
     chat: Chat
-    from_user: FromUser
+    from_user: FromUser = Field(..., alias="from")
     date: int
     old_chat_member: ChatMember
     new_chat_member: ChatMember
@@ -154,8 +157,8 @@ class Update(BaseModel):
     """
 
     update_id: int
-    message: Optional[Message]
-    edited_message: Optional[Message]
-    inline_query: Optional[InlineQuery]
-    chosen_inline_result: Optional[ChosenInlineResult]
-    my_chat_member: Optional[MyChatMember]
+    message: Optional[Message] = None
+    edited_message: Optional[EditedMessage] = None
+    inline_query: Optional[InlineQuery] = None
+    chosen_inline_result: Optional[ChosenInlineResult] = None
+    my_chat_member: Optional[MyChatMember] = None

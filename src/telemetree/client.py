@@ -37,5 +37,3 @@ class TelemetreeClient:
         if event:
             encrypted_event = self.ecnryption_service.encrypt(json.dumps(event.dict()))
             self.http_client.post(EncryptedEvent(event=encrypted_event))
-        else:
-            raise CustomEventNotSupported("We do not support non-Telegram events yet.")

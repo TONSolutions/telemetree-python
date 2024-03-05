@@ -23,8 +23,11 @@ class EncryptionService:
         Raises:
             ValueError: If an encryption error occurs.
         """
+        if isinstance(message, str):
+            message = message.encode("utf-8")
         try:
             rsa_key = PublicKey.load_pkcs1_openssl_pem(self.rsa_public_key)
+
             encrypted_message = encrypt(message, rsa_key)
             return b64encode(encrypted_message)
         except Exception as e:
