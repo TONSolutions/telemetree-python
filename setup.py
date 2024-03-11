@@ -2,7 +2,16 @@ from setuptools import setup, find_packages
 import subprocess
 
 
+import subprocess
+
+
 def get_version():
+    """
+    Retrieves the version of the project using `cz` command.
+
+    Returns:
+        str: The version of the project.
+    """
     try:
         output = (
             subprocess.check_output(["cz", "version", "--project"])
@@ -15,6 +24,12 @@ def get_version():
 
 
 def get_requirements():
+    """
+    Reads the requirements from the 'requirements.txt' file and returns them as a list.
+
+    Returns:
+        list: A list of requirements read from the 'requirements.txt' file.
+    """
     with open("requirements.txt") as f:
         return f.read().splitlines()
 
