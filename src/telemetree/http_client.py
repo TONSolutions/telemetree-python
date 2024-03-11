@@ -1,9 +1,13 @@
 from enum import Enum
 from socket import timeout
 import requests
+import logging
 
-from src.telemetree.constants import HTTP_TIMEOUT
-from src.telemetree.config import Config
+from telemetree.constants import HTTP_TIMEOUT
+from telemetree.config import Config
+from telemetree.telemetree_schemas import EncryptedEvent
+
+logger = logging.getLogger("telemetree.http_client")
 
 
 class HttpStatus(Enum):
@@ -24,12 +28,12 @@ class HttpClient:
         self.api_key = self.settings.api_key
         self.project_id = self.settings.project_id
 
-    def post(self, data: dict):
+    def post(self, data: EncryptedEvent):
         """
         Sends a POST request to the specified URL with the given data and headers.
 
         Args:
-            data (dict): The data to be sent in the request body.
+            data (EncryptedEvent): The data to be sent in the request body.
 
         Returns:
             HTTPResponse: The response object returned by the server.
@@ -46,6 +50,8 @@ class HttpClient:
                 "x-project-id": self.project_id,
             }
 
+            data = data.model_dump_json()
+
             request = requests.post(
                 self.url, json=data, headers=headers, timeout=HTTP_TIMEOUT
             )
@@ -57,5 +63,5 @@ class HttpClient:
             requests.exceptions.RequestException,
             timeout,
         ) as e:
-            print(f"Error: {e}")
+            logger.exception("Failed to send POST request: %s", e)
             raise e

@@ -162,3 +162,4 @@ class Update(BaseModel):
     inline_query: Optional[InlineQuery] = None
     chosen_inline_result: Optional[ChosenInlineResult] = None
     my_chat_member: Optional[MyChatMember] = None
+    event_source: str = "python-sdk"

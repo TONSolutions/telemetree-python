@@ -1,8 +1,11 @@
 import requests
-from src.telemetree import constants
-from src.telemetree.exceptions import WrongIdentityKeys
-from src.telemetree.telemetree_schemas import BotTrackingConfig
+import logging
 
+from telemetree import constants
+from telemetree.exceptions import WrongIdentityKeys
+from telemetree.telemetree_schemas import BotTrackingConfig
+
+logger = logging.getLogger("telemetree.config")
 
 
 class Config:
@@ -47,11 +50,27 @@ class Config:
 
         response_json = response.json()
         if response.status_code != 200:
+            logger.error(
+                "Failed to fetch the config. Status code: %s. Response: %s",
+                response.status_code,
+                response_json,
+            )
             raise WrongIdentityKeys(
                 f"Failed to fetch the config. Status code: {response.status_code}. Response: {response_json}"
             )
 
         config = BotTrackingConfig(**response_json)
+        transformation_dictionary = {
+            "ChosenInlineQueryResult": "chosen_inline_result",
+            "InlineQueryCalled": "inline_query",
+            "PreCheckoutQuery": "pre_checkout_query",
+        }
+        # Iterate over config.auto_capture_telegram_events and replace the values with the ones in transformation_dictionary
+        for i, event in enumerate(config.auto_capture_telegram_events):
+            if event in transformation_dictionary:
+                config.auto_capture_telegram_events[i] = transformation_dictionary[
+                    event
+                ]
 
         return config
 

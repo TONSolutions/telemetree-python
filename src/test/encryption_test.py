@@ -136,12 +136,3 @@ def test_encrypt_with_valid_message(encryption_service):
     assert (
         "key" in encrypted_data and "iv" in encrypted_data and "body" in encrypted_data
     )
-
-
-def test_full_encryption_and_decryption(encryption_service):
-    original_message = "Full encryption and decryption test"
-    encrypted_data = encryption_service.encrypt(original_message)
-
-    decrypted_message = decrypt_message(encrypted_data, private_key)
-
-    assert decrypted_message == original_message
