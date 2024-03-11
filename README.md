@@ -1,4 +1,7 @@
+![](https://tc-images-api.s3.eu-central-1.amazonaws.com/gif_cropped.gif)
 # Telemetree Python SDK
+[![PyPi license](https://badgen.net/pypi/license/pip/)](https://pypi.org/project/pip/)
+[![PyPI pyversions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10-blue)](https://test.pypi.org/project/telemetree/0.1.1/)
 
 The Telemetree Python SDK provides a convenient way to track and analyze Telegram events using the Telemetree service. With this SDK, you can easily capture and send Telegram events to the Telemetree platform for further analysis and insights.
 
