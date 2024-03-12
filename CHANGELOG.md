@@ -1,3 +1,9 @@
+## 0.1.4 (2024-03-12)
+
+### Fix
+
+- **pycryptodome**: fixed library import
+
 ## 0.1.3 (2024-03-12)
 
 ### Fix
