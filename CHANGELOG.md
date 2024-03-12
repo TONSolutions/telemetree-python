@@ -1,3 +1,9 @@
+## 0.1.2 (2024-03-12)
+
+### Fix
+
+- **telemetree**: fixed dependencies
+
 ## 0.1.1 (2024-03-11)
 
 ### Fix
