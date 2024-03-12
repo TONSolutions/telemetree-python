@@ -1,3 +1,9 @@
+## 0.1.5 (2024-03-12)
+
+### Fix
+
+- **setuptools**: Fixed the build error
+
 ## 0.1.4 (2024-03-12)
 
 ### Fix
