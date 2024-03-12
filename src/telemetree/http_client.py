@@ -1,7 +1,8 @@
 from enum import Enum
 from socket import timeout
-import requests
 import logging
+
+import requests
 
 from telemetree.constants import HTTP_TIMEOUT
 from telemetree.config import Config

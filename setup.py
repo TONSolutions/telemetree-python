@@ -2,9 +2,6 @@ from setuptools import setup, find_packages
 import subprocess
 
 
-import subprocess
-
-
 def get_version():
     """
     Retrieves the version of the project using `cz` command.
@@ -23,23 +20,12 @@ def get_version():
         return "0.0.0"
 
 
-def get_requirements():
-    """
-    Reads the requirements from the 'requirements.txt' file and returns them as a list.
-
-    Returns:
-        list: A list of requirements read from the 'requirements.txt' file.
-    """
-    with open("requirements.txt") as f:
-        return f.read().splitlines()
-
-
 setup(
     name="telemetree",
     version=get_version(),
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    install_requires=get_requirements(),
+    install_requires=["requests", "pycrypto", "rsa", "pydantic"],
     author="Chris Cherniakov",
     author_email="chris@ton.solutions",
     description="Python SDK for Telegram event tracking and analytics.",
