@@ -25,7 +25,7 @@ setup(
     version=get_version(),
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    install_requires=["requests", "pycrypto", "rsa", "pydantic"],
+    install_requires=["requests", "pycrypto", "rsa", "pydantic", "setuptools"],
     author="Chris Cherniakov",
     author_email="chris@ton.solutions",
     description="Python SDK for Telegram event tracking and analytics.",
