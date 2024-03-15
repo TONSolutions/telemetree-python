@@ -2,11 +2,11 @@ import json
 import logging
 from typing import Optional
 
-from telemetree.config import Config
-from telemetree.http_client import HttpClient
-from telemetree.telemetree_schemas import EncryptedEvent
-from telemetree.encryption import EncryptionService
-from telemetree.event_builder import EventBuilder
+from src.telemetree.config import Config
+from src.telemetree.http_client import HttpClient
+from src.telemetree.telemetree_schemas import EncryptedEvent
+from src.telemetree.encryption import EncryptionService
+from src.telemetree.event_builder import EventBuilder
 
 
 logger = logging.getLogger("telemetree.client")
@@ -26,10 +26,6 @@ class TelemetreeClient:
 
         self.settings = Config(self.api_key, self.project_id)
 
-        self.url = self.settings.config.host
-        self.auto_capture = self.settings.config.auto_capture_telegram
-        self.events = self.settings.config.auto_capture_telegram_events
-        self.commands = self.settings.config.auto_capture_commands
         self.public_key = self.settings.config.public_key
 
         self.encryption_service = EncryptionService(self.public_key)
@@ -50,8 +46,9 @@ class TelemetreeClient:
 
         if telegram_event:
             try:
+
                 encrypted_event = self.encryption_service.encrypt(
-                    json.dumps(telegram_event.dict())
+                    json.dumps(telegram_event.model_dump_json())
                 )
                 response = self.http_client.post(EncryptedEvent(**encrypted_event))
                 return response.status_code

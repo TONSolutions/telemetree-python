@@ -149,6 +149,7 @@ class Update(BaseModel):
 
     Attributes:
         update_id (int): The update's unique identifier.
+        app_name (str): The name of the application.
         message (Optional[Message]): New incoming message of any kind — text, photo, sticker, etc.
         edited_message (Optional[Message]): New version of a message that is known to the bot and was edited.
         inline_query (Optional[InlineQuery]): New incoming inline query.
@@ -157,9 +158,12 @@ class Update(BaseModel):
     """
 
     update_id: int
+
     message: Optional[Message] = None
     edited_message: Optional[EditedMessage] = None
     inline_query: Optional[InlineQuery] = None
     chosen_inline_result: Optional[ChosenInlineResult] = None
     my_chat_member: Optional[MyChatMember] = None
+    app_name: Optional[str] = None
+
     event_source: str = "python-sdk"

@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from src.telemetree.event_builder import EventBuilder
 from src.telemetree.config import Config
 from src.telemetree.telegram_schemas import Update
@@ -20,6 +20,8 @@ def mock_config():
                 "chosen_inline_result",
             ],
             "auto_capture_commands": ["/start", "/stop"],
+            "auto_capture_messages": ["Test message"],
+            "app_name": "Test app",
         }
         config_instance = Config(api_key="dummy_api_key", project_id="dummy_project_id")
         return config_instance
@@ -35,6 +37,8 @@ def mock_config_no_auto_capture_telegram():
             "host": "test_host",
             "auto_capture_telegram_events": [],
             "auto_capture_commands": ["/start", "/stop"],
+            "auto_capture_messages": ["Test message"],
+            "app_name": "Test app",
         }
         config_instance = Config(api_key="dummy_api_key", project_id="dummy_project_id")
         return config_instance

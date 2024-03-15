@@ -1,8 +1,8 @@
 from typing import Optional
 import logging
 
-from telemetree.telegram_schemas import Update
-from telemetree.config import Config
+from src.telemetree.telegram_schemas import Update
+from src.telemetree.config import Config
 
 logger = logging.getLogger("telemetree.event_builder")
 
@@ -13,6 +13,7 @@ class EventBuilder:
         self.config = self.settings.config
         self.events_to_track = set(self.config.auto_capture_telegram_events)
         self.commands_to_track = set(self.config.auto_capture_commands)
+        self.app_name = self.config.app_name
 
     def parse_telegram_update(self, update_dict: dict) -> Optional[Update]:
         """
@@ -25,6 +26,8 @@ class EventBuilder:
             Optional[Update]: The parsed Update object if the update should be tracked, None otherwise.
         """
         update = Update(**update_dict)
+        update.app_name = self.app_name
+
         return update if self.should_track_update(update) else None
 
     def should_track_update(self, update: Update) -> bool:
