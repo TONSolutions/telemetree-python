@@ -4,9 +4,9 @@ import logging
 
 import requests
 
-from src.telemetree.constants import HTTP_TIMEOUT
-from src.telemetree.config import Config
-from src.telemetree.telemetree_schemas import EncryptedEvent
+from telemetree.constants import HTTP_TIMEOUT
+from telemetree.config import Config
+from telemetree.telemetree_schemas import EncryptedEvent
 
 logger = logging.getLogger("telemetree.http_client")
 

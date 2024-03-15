@@ -1,9 +1,9 @@
 import requests
 import logging
 
-from src.telemetree import constants
-from src.telemetree.exceptions import WrongIdentityKeys
-from src.telemetree.telemetree_schemas import BotTrackingConfig
+from telemetree import constants
+from telemetree.exceptions import WrongIdentityKeys
+from telemetree.telemetree_schemas import BotTrackingConfig
 
 logger = logging.getLogger("telemetree.config")
 

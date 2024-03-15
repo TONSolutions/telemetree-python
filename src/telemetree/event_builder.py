@@ -1,8 +1,8 @@
 from typing import Optional
 import logging
 
-from src.telemetree.telegram_schemas import Update
-from src.telemetree.config import Config
+from telemetree.telegram_schemas import Update
+from telemetree.config import Config
 
 logger = logging.getLogger("telemetree.event_builder")
 

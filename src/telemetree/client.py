@@ -2,11 +2,11 @@ import json
 import logging
 from typing import Optional
 
-from src.telemetree.config import Config
-from src.telemetree.http_client import HttpClient
-from src.telemetree.telemetree_schemas import EncryptedEvent
-from src.telemetree.encryption import EncryptionService
-from src.telemetree.event_builder import EventBuilder
+from telemetree.config import Config
+from telemetree.http_client import HttpClient
+from telemetree.telemetree_schemas import EncryptedEvent
+from telemetree.encryption import EncryptionService
+from telemetree.event_builder import EventBuilder
 
 
 logger = logging.getLogger("telemetree.client")
