@@ -103,15 +103,3 @@ class Config:
             dict: The API key and the project ID.
         """
         return {"API Key": self.api_key, "Project ID": self.project_id}
-
-
-if __name__ == "__main__":
-    import os
-    from dotenv import load_dotenv
-
-    load_dotenv()
-
-    api_key = os.getenv("API_KEY")
-    project_id = os.getenv("PROJECT_ID")
-
-    config = Config(api_key, project_id)
