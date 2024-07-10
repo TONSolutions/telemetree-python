@@ -7,6 +7,8 @@ from telemetree.http_client import HttpClient
 from telemetree.telemetree_schemas import EncryptedEvent
 from telemetree.encryption import EncryptionService
 from telemetree.event_builder import EventBuilder
+from telemetree.orchestrator import orchestrate_event
+from telemetree.utils import convert_public_key
 
 
 logger = logging.getLogger("telemetree.client")
@@ -26,7 +28,7 @@ class TelemetreeClient:
 
         self.settings = Config(self.api_key, self.project_id)
 
-        self.public_key = self.settings.config.public_key
+        self.public_key = convert_public_key(self.settings.config.public_key)
 
         self.encryption_service = EncryptionService(self.public_key)
         self.http_client = HttpClient(self.settings)
@@ -42,16 +44,13 @@ class TelemetreeClient:
         Returns:
             Optional[int]: The status code of the HTTP response if the event was tracked successfully, None otherwise.
         """
-        telegram_event = self.event_builder.parse_telegram_update(event)
-
-        if telegram_event:
-            try:
-
-                encrypted_event = self.encryption_service.encrypt(
-                    json.dumps(telegram_event.model_dump_json())
-                )
-                response = self.http_client.post(EncryptedEvent(**encrypted_event))
-                return response.status_code
-            except Exception as e:
-                logger.exception("Error tracking event: %s", e)
+        try:
+            orchestrated_event = orchestrate_event(event)
+            encrypted_event = self.encryption_service.encrypt(
+                json.dumps(orchestrated_event)
+            )
+            response = self.http_client.post(EncryptedEvent(**encrypted_event))
+            return response.status_code
+        except Exception as e:
+            logger.exception("Error tracking event: %s", e)
         return None
