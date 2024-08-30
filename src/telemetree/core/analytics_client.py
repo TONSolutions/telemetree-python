@@ -2,19 +2,19 @@ import json
 import logging
 from typing import Optional
 
-from telemetree.config import Config
-from telemetree.http_client import HttpClient
-from telemetree.telemetree_schemas import EncryptedEvent
+from telemetree.core.config import Config
+from telemetree.http.http_client import HttpClient
+from telemetree.schemas.telemetree_schemas import EncryptedEvent
 from telemetree.encryption import EncryptionService
-from telemetree.event_builder import EventBuilder
-from telemetree.orchestrator import orchestrate_event
+from telemetree.core.event_builder import EventBuilder
+from telemetree.core.orchestrator import orchestrate_event
 from telemetree.utils import convert_public_key
 
 
-logger = logging.getLogger("telemetree.client")
+logger = logging.getLogger("telemetree.tracking_sclient")
 
 
-class TelemetreeClient:
+class TelemetreeAnalytics:
     def __init__(self, api_key: str, project_id: str):
         """
         Initializes the TelemetreeClient with the provided API key and project ID.

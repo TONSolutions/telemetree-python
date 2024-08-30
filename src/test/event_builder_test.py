@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import patch
-from src.telemetree.event_builder import EventBuilder
-from src.telemetree.config import Config
-from src.telemetree.telegram_schemas import Update
+from src.telemetree.core.event_builder import EventBuilder
+from src.telemetree.core.config import Config
+from src.telemetree.schemas.telegram_schemas import Update
 import src.test.fixtures as fixtures
 
 

@@ -1,9 +1,9 @@
 import requests
 import logging
 
-from telemetree import constants
-from telemetree.exceptions import WrongIdentityKeys
-from telemetree.telemetree_schemas import BotTrackingConfig
+from telemetree.schemas.constants import HTTP_TIMEOUT, ENDPOINT_URL
+from telemetree.schemas.exceptions import WrongIdentityKeys
+from telemetree.schemas.telemetree_schemas import Config
 
 logger = logging.getLogger("telemetree.config")
 
@@ -44,9 +44,8 @@ class Config:
             dict: The encryption keys.
         """
 
-        url = f"https://config.ton.solutions/v1/client/config?project={self.project_id}"
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        response = requests.get(url, headers=headers, timeout=constants.HTTP_TIMEOUT)
+        request_url = f"{ENDPOINT_URL}/config?project={self.project_id}"
+        response = requests.get(request_url, timeout=HTTP_TIMEOUT)
 
         response_json = response.json()
         if response.status_code != 200:
@@ -59,21 +58,7 @@ class Config:
                 f"Failed to fetch the config. Status code: {response.status_code}. Response: {response_json}"
             )
 
-        config = BotTrackingConfig(**response_json)
-
-        transformation_dictionary = {
-            "ChosenInlineQueryResult": "chosen_inline_result",
-            "InlineQueryCalled": "inline_query",
-            "PreCheckoutQuery": "pre_checkout_query",
-        }
-        # Iterate over config.auto_capture_telegram_events and replace the values with the ones in transformation_dictionary
-        for i, event in enumerate(config.auto_capture_telegram_events):
-            if event in transformation_dictionary:
-                config.auto_capture_telegram_events[i] = transformation_dictionary[
-                    event
-                ]
-        # Add the auto_capture_messages to auto_capture_commands
-        config.auto_capture_commands.extend(config.auto_capture_messages)
+        config = Config(**response_json)
 
         return config
 
