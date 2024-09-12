@@ -5,6 +5,8 @@
 
 The Telemetree Python SDK provides a convenient way to track and analyze Telegram events using the Telemetree service. With this SDK, you can easily capture and send Telegram events to the Telemetree platform for further analysis and insights.
 
+![Alt](https://repobeats.axiom.co/api/embed/18ee5bb9c80b65e0e060cd5b16802b38262b2a87.svg "Repobeats analytics image")
+
 ### Features
 
 - Automatically capture Telegram events and send them to Telemetree
