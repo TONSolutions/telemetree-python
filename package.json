@@ -1,0 +1,20 @@
+{
+  "name": "telemetree",
+  "version": "0.1.0",
+  "description": "Node.js SDK for Telegram event tracking and analytics.",
+  "main": "src/telemetree/client.js",
+  "scripts": {
+    "build": "echo 'Building the project...' && exit 0",
+    "test": "echo 'Running tests...' && exit 0"
+  },
+  "author": "Chris Cherniakov",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
+  }
+}
