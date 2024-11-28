@@ -5,8 +5,8 @@ import logging
 import requests
 
 from telemetree.constants import HTTP_TIMEOUT
-from telemetree.config import Config
-from telemetree.telemetree_schemas import EncryptedEvent
+from telemetree.exceptions import WrongIdentityKeys
+from telemetree.schemas import EncryptedEvent
 
 logger = logging.getLogger("telemetree.http_client")
 
@@ -23,11 +23,33 @@ class HttpStatus(Enum):
 
 
 class HttpClient:
-    def __init__(self, settings: Config) -> None:
-        self.settings = settings
-        self.url = self.settings.config.host
-        self.api_key = self.settings.api_key
-        self.project_id = self.settings.project_id
+    def __init__(self, api_key: str, project_id: str) -> None:
+        self.api_key = api_key
+        self.project_id = project_id
+
+    def get(self, config_url: str):
+        """
+        Sends a GET request to the specified URL with the given headers.
+        """
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+        }
+        url = f"{config_url}?project={self.project_id}"
+
+        request = requests.get(url, headers=headers, timeout=HTTP_TIMEOUT)
+        response_json = request.json()
+        if request.status_code != HttpStatus.OK.value:
+            logger.error(
+                "Failed to fetch the config. Status code: %s. Response: %s",
+                request.status_code,
+                response_json,
+            )
+            raise WrongIdentityKeys(
+                f"Failed to fetch the config. Status code: {request.status_code}. Response: {response_json}"
+            )
+
+        return response_json
 
     def post(self, data: EncryptedEvent):
         """
@@ -56,9 +78,8 @@ class HttpClient:
             request = requests.post(
                 self.url, json=data, headers=headers, timeout=HTTP_TIMEOUT
             )
-
-            return request
-
+            request.raise_for_status()
+            return request.json()
         except (
             requests.exceptions.HTTPError,
             requests.exceptions.RequestException,

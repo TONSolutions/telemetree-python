@@ -1,20 +1,21 @@
 import json
 import logging
-from typing import Optional
+from typing import Optional, Union
+
+from pydantic import ValidationError
 
 from telemetree.config import Config
 from telemetree.http_client import HttpClient
-from telemetree.telemetree_schemas import EncryptedEvent
+from telemetree.schemas import EncryptedEvent, Event
 from telemetree.encryption import EncryptionService
 from telemetree.event_builder import EventBuilder
-from telemetree.orchestrator import orchestrate_event
-from telemetree.utils import convert_public_key
+from telemetree.utils import validate_uuid
 
 
 logger = logging.getLogger("telemetree.client")
 
 
-class TelemetreeClient:
+class Telemetree:
     def __init__(self, api_key: str, project_id: str):
         """
         Initializes the TelemetreeClient with the provided API key and project ID.
@@ -23,34 +24,53 @@ class TelemetreeClient:
             api_key (str): The API key for authentication.
             project_id (str): The project ID for the Telemetree service.
         """
-        self.api_key = api_key
-        self.project_id = project_id
+        self.api_key = validate_uuid(api_key)
+        self.project_id = validate_uuid(project_id)
 
-        self.settings = Config(self.api_key, self.project_id)
+        self.http_client = HttpClient(self.api_key, self.project_id)
 
-        self.public_key = convert_public_key(self.settings.config.public_key)
+        self.config = Config(self.http_client)
+        self.public_key = self.config.get_public_key()
+        self.host = self.config.get_host()
 
         self.encryption_service = EncryptionService(self.public_key)
-        self.http_client = HttpClient(self.settings)
-        self.event_builder = EventBuilder(self.settings)
 
-    def track(self, event: dict) -> Optional[int]:
-        """
-        Tracks a Telegram update event.
+    def track(self, event: Union[Event, dict]) -> dict:
+        """Key function to track events.
 
         Args:
-            event (dict): The Telegram update event to track.
+            event (Union[Event, dict]): The event to track.
+
+        Required:
+            - event_type (str): The type of event to track.
+            - telegram_id (int): The Telegram ID of the user.
+        Optional:
+            - is_premium (bool): The premium status of the user.
+            - username (str): The username of the user.
+            - firstname (str): The first name of the user.
+            - lastname (str): The last name of the user.
+            - language (str): The language of the user.
+            - referrer_type (str): The referrer type.
+            - referrer (int): The referrer.
+
+        Raises:
+            ValueError: If the event is invalid.
 
         Returns:
-            Optional[int]: The status code of the HTTP response if the event was tracked successfully, None otherwise.
+            dict: The response from the server.
         """
-        try:
-            orchestrated_event = orchestrate_event(event)
-            encrypted_event = self.encryption_service.encrypt(
-                json.dumps(orchestrated_event)
-            )
-            response = self.http_client.post(EncryptedEvent(**encrypted_event))
-            return response.status_code
-        except Exception as e:
-            logger.exception("Error tracking event: %s", e)
-        return None
+        if not isinstance(event, Event) and not isinstance(event, dict):
+            logger.error("Invalid type: expected Event type or dictionary")
+            raise ValueError("Invalid type: expected Event type or dictionary")
+        if isinstance(event, dict):
+            try:
+                event["application_id"] = self.application_id
+                event = Event(**event)
+            except ValidationError as e:
+                logger.error("Invalid event: %s", e)
+                raise ValueError(f"Invalid event: {e}") from e
+
+        stringified_event = event.model_dump_json()
+        encrypted_event = self.encryption_service.encrypt(stringified_event)
+
+        return self.http_client.post(encrypted_event)

@@ -1,9 +1,7 @@
-import requests
 import logging
 
-from telemetree import constants
-from telemetree.exceptions import WrongIdentityKeys
-from telemetree.telemetree_schemas import BotTrackingConfig
+from telemetree.schemas import TelemetreeConfig
+from telemetree.http_client import HttpClient
 
 logger = logging.getLogger("telemetree.config")
 
@@ -23,83 +21,28 @@ class Config:
 
     """
 
+    CONFIG_URL = "https://config.ton.solutions/v1/client/config"
+
     def __init__(
         self,
-        api_key: str,
-        project_id: str,
+        http_client: HttpClient,
     ) -> None:
-        self.project_id = project_id
-        self.api_key = api_key
+        self.http_client = http_client
         self.config = self.__get_config()
 
-    def __get_config(self) -> dict:
+    def __get_config(self) -> TelemetreeConfig:
         """
         Get the encryption keys from the Telemetree configuration service.
 
-        Args:
-            project_id (str): The project ID.
-            api_key (str): The API key.
-
         Returns:
-            dict: The encryption keys.
+            TelemetreeConfig: The Telemetree configuration.
         """
+        response = self.http_client.get(self.CONFIG_URL)
 
-        url = f"https://config.ton.solutions/v1/client/config?project={self.project_id}"
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        response = requests.get(url, headers=headers, timeout=constants.HTTP_TIMEOUT)
+        return TelemetreeConfig(**response)
 
-        response_json = response.json()
-        if response.status_code != 200:
-            logger.error(
-                "Failed to fetch the config. Status code: %s. Response: %s",
-                response.status_code,
-                response_json,
-            )
-            raise WrongIdentityKeys(
-                f"Failed to fetch the config. Status code: {response.status_code}. Response: {response_json}"
-            )
+    def get_public_key(self) -> str:
+        return self.config.public_key
 
-        config = BotTrackingConfig(**response_json)
-
-        transformation_dictionary = {
-            "ChosenInlineQueryResult": "chosen_inline_result",
-            "InlineQueryCalled": "inline_query",
-            "PreCheckoutQuery": "pre_checkout_query",
-        }
-        # Iterate over config.auto_capture_telegram_events and replace the values with the ones in transformation_dictionary
-        for i, event in enumerate(config.auto_capture_telegram_events):
-            if event in transformation_dictionary:
-                config.auto_capture_telegram_events[i] = transformation_dictionary[
-                    event
-                ]
-        # Add the auto_capture_messages to auto_capture_commands
-        config.auto_capture_commands.extend(config.auto_capture_messages)
-
-        return config
-
-    def set_api_key(self, api_key: str) -> None:
-        """
-        Set the API key.
-
-        Args:
-            api_key (str): The API key.
-        """
-        self.api_key = api_key
-
-    def set_project_id(self, project_id: str) -> None:
-        """
-        Set the project ID.
-
-        Args:
-            project_id (str): The project ID.
-        """
-        self.project_id = project_id
-
-    def get_credentials(self) -> dict:
-        """
-        Get the API key and the project ID.
-
-        Returns:
-            dict: The API key and the project ID.
-        """
-        return {"API Key": self.api_key, "Project ID": self.project_id}
+    def get_host(self) -> str:
+        return self.config.host

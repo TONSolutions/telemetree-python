@@ -6,6 +6,8 @@ from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad
 from rsa import PublicKey, encrypt
 
+from telemetree.schemas import EncryptedEvent
+
 logger = logging.getLogger("telemetree.encryption")
 
 
@@ -13,28 +15,22 @@ class EncryptionService:
     def __init__(self, public_key):
         self.rsa_public_key = public_key
 
-    def rsa_encrypt(self, message: str) -> bytes:
+    def rsa_encrypt(self, message: bytes) -> bytes:
         """
         Encrypts a message using RSA encryption with the provided public key.
 
         Args:
-            message (Union[str, bytes]): The message to encrypt. Can be a string or bytes.
+            message (bytes): The message to encrypt.
 
         Returns:
             bytes: The encrypted message in base64 encoding.
-
-        Raises:
-            ValueError: If the provided message is not a string or bytes, or if an encryption error occurs.
         """
-        if not isinstance(message, (str, bytes)):
-            raise ValueError("Message must be a string or bytes")
-
-        if isinstance(message, str):
-            message = message.encode("utf-8")
         try:
-            rsa_key = PublicKey.load_pkcs1_openssl_pem(self.rsa_public_key)
+            # Convert bytes to hex string first, matching Go implementation
+            hex_str = message.hex().encode("utf-8")
 
-            encrypted_message = encrypt(message, rsa_key)
+            rsa_key = PublicKey.load_pkcs1(self.rsa_public_key)
+            encrypted_message = encrypt(hex_str, rsa_key)
             return b64encode(encrypted_message)
         except Exception as e:
             logger.exception("Failed to encrypt message with RSA: %s", e)
@@ -100,9 +96,9 @@ class EncryptionService:
             encrypted_body = self.encrypt_with_aes(key, iv, message)
 
             return {
-                "key": encrypted_key.decode("utf-8"),
-                "iv": encrypted_iv.decode("utf-8"),
-                "body": encrypted_body.decode("utf-8"),
+                "key": encrypted_key,
+                "iv": encrypted_iv,
+                "body": encrypted_body,
             }
         except Exception as e:
             logger.exception("Failed to encrypt message: %s", e)
